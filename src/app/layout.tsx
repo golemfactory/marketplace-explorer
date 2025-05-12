@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import Image from 'next/image'
+import { QueryClientProvider } from '@/providers/QueryClientProvider'
 import './globals.css'
 
 const geistSans = Geist({
@@ -28,10 +29,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
       >
-        <div className="flex-none w-full h-16 flex  bg-primary">
-          <Image src="/golem_logo.png" alt="Golem logo" width={180} height={38} priority />
-        </div>
-        <div className="flex flex-col flex-1">{children}</div>
+        <QueryClientProvider>
+          <div className="flex-none w-full h-16 flex  bg-primary">
+            <Image src="/golem_logo.png" alt="Golem logo" width={180} height={38} priority />
+          </div>
+          <div className="flex flex-col flex-1">{children}</div>
+        </QueryClientProvider>
       </body>
     </html>
   )

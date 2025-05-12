@@ -1,6 +1,7 @@
 import { columns, type Offer, OffersTable } from '@/components/offers-table'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
+import { useOffersQuery } from '@/lib/query'
 
 async function getData(): Promise<Offer[]> {
   // Fetch data from your API here.

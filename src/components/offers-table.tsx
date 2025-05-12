@@ -1,6 +1,7 @@
 'use client'
 
-import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table'
+import { type ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table'
+import { useOffersQuery } from '@/lib/query'
 
 import {
   Table,
@@ -45,9 +46,12 @@ export function OffersTable<TData, TValue>({ columns, data }: OffersTableProps<T
     getCoreRowModel: getCoreRowModel(),
   })
 
+  const { data: offers } = useOffersQuery()
+  console.log(offers)
+
   return (
     <Table className="border-separate border-spacing-y-4 text-lg font-bold w-full">
-      <TableHeader className="bg-primary hover:none h-12">
+      <TableHeader className="bg-primary h-12">
         {table.getHeaderGroups().map((headerGroup) => (
           <TableRow key={headerGroup.id}>
             {headerGroup.headers.map((header) => {
