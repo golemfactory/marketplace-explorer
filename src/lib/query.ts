@@ -1,5 +1,10 @@
 import { QueryClient, useQuery } from '@tanstack/react-query'
-import { getEntitiesForStringAnnotationValue } from '@/lib/golem-base-rpc'
+import {
+  getEntitiesForStringAnnotationValue,
+  getStorageValue,
+  queryEntities,
+} from '@/lib/golem-base-rpc'
+import { offerSchema } from './schema'
 
 export const defaultQueryOptions = {
   refetchOnWindowFocus: false,
@@ -16,6 +21,29 @@ export const queryClient = new QueryClient({
 export const useOffersQuery = () => {
   return useQuery({
     queryKey: ['offers'],
-    queryFn: () => getEntitiesForStringAnnotationValue('golem_marketplace_type', 'Offer'),
+    queryFn: async () => {
+      const entities = await queryEntities('golem_marketplace_type="Offer"')
+      const offers = (
+        await Promise.all(
+          entities.map(async (offer) => {
+            try {
+              const parsedOffer = offerSchema.safeParse(JSON.parse(offer))
+              if (!parsedOffer.success) {
+                console.warn(`Invalid offer ${offer}, ${JSON.stringify(offer)}`, parsedOffer.error)
+                return null
+              }
+              console.debug(`Found offer ${offer}`)
+              return parsedOffer.data
+            } catch (error) {
+              console.warn(`Error parsing offer ${offer}:`, error)
+              return null
+            }
+          }),
+        )
+      ).filter((offer) => offer !== null)
+
+      console.info(`Found ${offers?.length} offers`, offers)
+      return offers
+    },
   })
 }

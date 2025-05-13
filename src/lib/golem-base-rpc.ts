@@ -2,17 +2,24 @@ import axios from 'axios'
 import { env } from '@/env'
 import { offerSchema, type Offer } from '@/lib/schema'
 
+type JsonRpcResponse = {
+  jsonrpc: string
+  id: number
+  result: unknown
+}
+
 const jsonRpcRequest = async (method: string, params?: unknown[]): Promise<unknown> => {
   try {
     console.debug('jsonRpcRequest', method, params)
-    const response = await axios.post(env.NEXT_PUBLIC_GOLEM_BASE_RPC_URL, {
+    const response = await axios.post<JsonRpcResponse>(env.NEXT_PUBLIC_GOLEM_BASE_RPC_URL, {
       jsonrpc: '2.0',
       id: 1,
       method,
       params,
     })
     console.debug('jsonRpcResponse', response.data)
-    return response.data
+
+    return response.data.result
   } catch (error) {
     console.error('jsonRpcRequest error', error)
     if (axios.isAxiosError(error) && error.response) {
@@ -20,6 +27,15 @@ const jsonRpcRequest = async (method: string, params?: unknown[]): Promise<unkno
     }
     throw error
   }
+}
+
+export const getStorageValue = async (key: string) => {
+  const result = await jsonRpcRequest('golembase_getStorageValue', [key])
+  if (typeof result === 'string') {
+    const decodedResult = Buffer.from(result, 'base64').toString('utf-8')
+    return JSON.parse(decodedResult)
+  }
+  throw new Error('Expected a string result for base64 decoding')
 }
 
 export const getEntitiesForStringAnnotationValue = async (key: string, value: string) => {
@@ -30,22 +46,22 @@ export const getEntitiesForStringAnnotationValue = async (key: string, value: st
     return []
   }
 
-  const validOffers: Offer[] = []
+  console.info(`Found ${result.length} entities for key ${key} and value ${value}`)
 
-  for (const entity of result) {
-    try {
-      const parsed = offerSchema.safeParse(entity)
-      if (parsed.success) {
-        validOffers.push(parsed.data)
-      } else {
-        console.debug('Skipping invalid offer:', parsed.error.format())
-      }
-    } catch (error) {
-      console.debug('Error parsing offer:', error)
-    }
+  return result
+}
+
+export const queryEntities = async (query: string) => {
+  const result = await jsonRpcRequest('golembase_queryEntities', [query])
+
+  if (!Array.isArray(result)) {
+    console.warn('Expected array of entities but got:', result)
+    return []
   }
 
-  console.info(`Found ${validOffers.length} valid offers out of ${result.length} entities`)
+  console.info(`Found ${result.length} entities for query ${query}`)
 
-  return validOffers
+  return result.map((entity) => {
+    return Buffer.from(entity.value, 'base64').toString('utf-8')
+  })
 }

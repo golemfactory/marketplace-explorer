@@ -1,84 +1,13 @@
 import { z } from 'zod'
 
-// CPU Capabilities Schema
-const cpuCapabilitySchema = z.union([
-  z.literal('sse3'),
-  z.literal('pclmulqdq'),
-  z.literal('dtes64'),
-  z.literal('monitor'),
-  z.literal('dscpl'),
-  z.literal('vmx'),
-  z.literal('eist'),
-  z.literal('tm2'),
-  z.literal('ssse3'),
-  z.literal('fma'),
-  z.literal('cmpxchg16b'),
-  z.literal('pdcm'),
-  z.literal('pcid'),
-  z.literal('sse41'),
-  z.literal('sse42'),
-  z.literal('x2apic'),
-  z.literal('movbe'),
-  z.literal('popcnt'),
-  z.literal('tsc_deadline'),
-  z.literal('aesni'),
-  z.literal('xsave'),
-  z.literal('osxsave'),
-  z.literal('avx'),
-  z.literal('f16c'),
-  z.literal('rdrand'),
-  z.literal('fpu'),
-  z.literal('vme'),
-  z.literal('de'),
-  z.literal('pse'),
-  z.literal('tsc'),
-  z.literal('msr'),
-  z.literal('pae'),
-  z.literal('mce'),
-  z.literal('cx8'),
-  z.literal('apic'),
-  z.literal('sep'),
-  z.literal('mtrr'),
-  z.literal('pge'),
-  z.literal('mca'),
-  z.literal('cmov'),
-  z.literal('pat'),
-  z.literal('pse36'),
-  z.literal('clfsh'),
-  z.literal('ds'),
-  z.literal('acpi'),
-  z.literal('mmx'),
-  z.literal('fxsr'),
-  z.literal('sse'),
-  z.literal('sse2'),
-  z.literal('ss'),
-  z.literal('htt'),
-  z.literal('tm'),
-  z.literal('pbe'),
-  z.literal('fsgsbase'),
-  z.literal('adjust_msr'),
-  z.literal('smep'),
-  z.literal('rep_movsb_stosb'),
-  z.literal('invpcid'),
-  z.literal('deprecate_fpu_cs_ds'),
-  z.literal('mpx'),
-  z.literal('rdseed'),
-  z.literal('adx'),
-  z.literal('smap'),
-  z.literal('clflushopt'),
-  z.literal('processor_trace'),
-  z.literal('sgx'),
-  z.literal('sgx_lc'),
-])
-
 // CPU Schema
 const cpuSchema = z.object({
-  architecture: z.literal('x86_64'),
-  capabilities: z.array(cpuCapabilitySchema),
+  architecture: z.union([z.literal('x86_64'), z.literal('aarch64')]),
+  capabilities: z.array(z.string()).optional(),
   cores: z.number(),
-  model: z.string(),
   threads: z.number(),
-  vendor: z.string(),
+  model: z.string().optional(),
+  vendor: z.string().optional(),
 })
 
 // Memory Schema
@@ -109,7 +38,7 @@ const nodeSchema = z.object({
 
 // Runtime Schema
 const runtimeSchema = z.object({
-  capabilities: z.array(z.string()),
+  capabilities: z.array(z.string()).optional(),
   name: z.string(),
   version: z.string(),
 })
@@ -152,9 +81,11 @@ const pricingModelLinearSchema = z.object({
 })
 
 // Pricing Model Schema
-const pricingModelSchema = z.object({
-  '@tag': z.literal('linear'),
-  linear: pricingModelLinearSchema,
+const pricingSchema = z.object({
+  model: z.object({
+    '@tag': z.literal('linear'),
+    linear: pricingModelLinearSchema,
+  }),
 })
 
 // Payment Usage Schema
@@ -166,11 +97,17 @@ const paymentUsageSchema = z.object({
 const paymentSchema = z.object({
   'debit-notes': paymentDebitNotesSchema,
   platform: paymentPlatformsSchema,
-  pricing: z.object({
-    model: pricingModelSchema,
+})
+
+// Scheme Schema
+const scheme = z.object({
+  '@tag': z.literal('payu'),
+  payu: z.object({
+    'debit-note': z.object({
+      'interval-sec?': z.number().optional().default(120),
+    }),
+    'payment-timeout-sec?': z.number().optional().default(120),
   }),
-  scheme: z.string(),
-  usage: paymentUsageSchema,
 })
 
 // Activity Schema
@@ -183,6 +120,9 @@ const golemPropertiesSchema = z.object({
   activity: activitySchema,
   com: z.object({
     payment: paymentSchema,
+    pricing: pricingSchema,
+    scheme: scheme,
+    usage: paymentUsageSchema,
   }),
   inf: z.object({
     cpu: cpuSchema,
