@@ -4,7 +4,7 @@ import {
   getStorageValue,
   queryEntities,
 } from '@/lib/golem-base-rpc'
-import { offerSchema } from './schema'
+import { Offer, offerSchema } from './schema'
 
 export const defaultQueryOptions = {
   refetchOnWindowFocus: false,

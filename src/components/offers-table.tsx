@@ -4,7 +4,9 @@ import {
   type ColumnDef,
   flexRender,
   getCoreRowModel,
+  getFilteredRowModel,
   getPaginationRowModel,
+  getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
 
@@ -26,10 +28,22 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
-import type { Offer } from '@/lib/schema'
+import type { Filters, Offer } from '@/lib/schema'
 import { useOffersQuery } from '@/lib/query'
 import { Button } from '@/components/ui/button'
-import { FilterIcon } from 'lucide-react'
+import { FilterIcon, CpuIcon, MemoryStick, DatabaseIcon, Banknote, NetworkIcon } from 'lucide-react'
+import { OfferDetailsDialog } from './offer-details-dialog'
+import { useState } from 'react'
+import { OfferFilterDialog } from './offer-filter-dialog'
+
+const cellContent = (value: string, icon: React.ReactNode) => {
+  return (
+    <div className="flex flex-row items-center">
+      <div className="m-2">{icon}</div>
+      <div>{value}</div>
+    </div>
+  )
+}
 
 const columns: ColumnDef<Offer>[] = [
   {
@@ -37,38 +51,78 @@ const columns: ColumnDef<Offer>[] = [
     header: 'Provider',
   },
   {
-    accessorFn: (offer) =>
-      `${offer.properties.golem.inf.cpu.cores} / ${offer.properties.golem.inf.cpu.threads}`,
-    header: 'Cores / Threads',
-  },
-  {
-    accessorFn: (offer) => offer.properties.golem.inf.mem.gib.toFixed(2),
-    header: 'Memory (GiB)',
-  },
-  {
-    accessorFn: (offer) => offer.properties.golem.inf.storage.gib.toFixed(2),
-    header: 'Storage (GiB)',
-  },
-  {
-    accessorFn: (offer) => {
-      const duration = offer.properties.golem.com.pricing.model.linear.coeffs[0]
-      const cpu = offer.properties.golem.com.pricing.model.linear.coeffs[1]
-      const initialPrice = offer.properties.golem.com.pricing.model.linear.coeffs[2]
-      const price = (duration + cpu) * 3600 + initialPrice
-      return `${price.toFixed(2)} GLM/h`
+    id: 'cpuCores',
+    accessorFn: (offer) => offer.properties.golem.inf.cpu.cores,
+    cell: (info) => cellContent(info.getValue() as string, <CpuIcon />),
+    header: 'Cores',
+    enableColumnFilter: true,
+    filterFn: (row, _id, value) => {
+      return row.original.properties.golem.inf.cpu.cores >= value
     },
+    enableSorting: true,
+  },
+  {
+    id: 'memoryGiB',
+    accessorFn: (offer) => offer.properties.golem.inf.mem.gib.toFixed(2),
+    cell: (info) => cellContent(info.getValue() as string, <MemoryStick />),
+    header: 'Memory (GiB)',
+    enableColumnFilter: true,
+    filterFn: (row, _id, value) => {
+      return row.original.properties.golem.inf.mem.gib >= value
+    },
+    enableSorting: true,
+  },
+  {
+    id: 'storageGiB',
+    accessorFn: (offer) => offer.properties.golem.inf.storage.gib.toFixed(2),
+    cell: (info) => cellContent(info.getValue() as string, <DatabaseIcon />),
+    header: 'Storage (GiB)',
+    enableColumnFilter: true,
+    filterFn: (row, _id, value) => {
+      return row.original.properties.golem.inf.storage.gib >= value
+    },
+    enableSorting: true,
+  },
+  {
+    id: 'network',
+    accessorFn: (offer) =>
+      `${offer.mainNetwork && offer.testNetwork ? 'Mainnet/Testnet' : offer.mainNetwork ? 'Mainnet' : 'Testnet'}`,
+    cell: (info) => cellContent(info.getValue() as string, <NetworkIcon />),
+    header: 'Network',
+    enableColumnFilter: true,
+    filterFn: (row, _id, value) => {
+      return (
+        (value === 'mainnet' && row.original.mainNetwork) ||
+        (value === 'testnet' && row.original.testNetwork)
+      )
+    },
+  },
+  {
+    id: 'pricePerHour',
+    accessorFn: (offer) => {
+      const pricePerHour =
+        offer.properties.golem.com.pricing.model.linear.cpuPerHour +
+        offer.properties.golem.com.pricing.model.linear.envPerHour
+      return `${pricePerHour.toFixed(2)} GLM/h`
+    },
+    cell: (info) => cellContent(info.getValue() as string, <Banknote />),
     header: 'Price',
+    enableSorting: true,
   },
 ]
 
+const pageSize = 10
+
 export function OffersTable() {
-  const pageSize = 5
   const { data: offers } = useOffersQuery()
+  const [showDetailsModal, setShowDetailsModal] = useState(false)
+  const [showFilterModal, setShowFilterModal] = useState(false)
+  const [selectedOffer, setSelectedOffer] = useState<Offer | undefined>(undefined)
 
   const table = useReactTable({
     data: offers ?? [],
     columns,
-    pageCount: Math.ceil(((offers?.length ?? 0) - 1) / pageSize),
+
     initialState: {
       pagination: {
         pageIndex: 0,
@@ -77,17 +131,50 @@ export function OffersTable() {
     },
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
   })
 
-  console.debug('offers to render in the table', offers)
-  console.debug('table state', table.getState())
+  const onOfferClick = (offer: Offer) => {
+    console.log('Offer clicked', offer)
+    setSelectedOffer(offer)
+    setShowDetailsModal(true)
+  }
+
+  const onFilterChange = (filters: Filters) => {
+    console.log('New filters:', filters)
+    table.setColumnFilters([
+      {
+        id: 'cpuCores',
+        value: filters.cpuCores,
+      },
+      {
+        id: 'memoryGiB',
+        value: filters.memoryGiB,
+      },
+      {
+        id: 'storageGiB',
+        value: filters.storageGiB,
+      },
+      {
+        id: 'network',
+        value: filters.network,
+      },
+    ])
+  }
 
   return (
     <div>
       <div className="flex flex-1 justify-between">
-        <div className="text-2xl font-bold flex-1">{offers?.length ?? 0} active offers</div>
+        <div className="text-2xl font-bold flex-1">
+          {table.getFilteredRowModel().rows.length} active offers
+        </div>
         <div>
-          <Button variant="outline" className="rounded-md bg-primary text-primary-foreground">
+          <Button
+            variant="outline"
+            className="rounded-md bg-primary text-primary-foreground"
+            onClick={() => setShowFilterModal(true)}
+          >
             <FilterIcon className="mr-2 h-4 w-4" />
             Filter
           </Button>
@@ -96,7 +183,7 @@ export function OffersTable() {
       <Table className="border-separate border-spacing-y-4 text-lg font-bold w-full">
         <TableHeader className="bg-primary h-12">
           {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
+            <TableRow key={headerGroup.id} style={{ backgroundColor: 'var(--primary)' }}>
               {headerGroup.headers.map((header) => {
                 return (
                   <TableHead key={header.id} className="text-primary-foreground px-4">
@@ -115,10 +202,11 @@ export function OffersTable() {
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && 'selected'}
-                className="bg-secondary"
+                className="bg-secondary hover:bg-primary/20"
+                onClick={() => onOfferClick(row.original)}
               >
                 {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id} className="px-4">
+                  <TableCell key={cell.id} className="select-none">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}
@@ -137,6 +225,7 @@ export function OffersTable() {
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious
+              className="select-none"
               onClick={() => table.previousPage()}
               isActive={table.getCanPreviousPage()}
               style={{
@@ -156,6 +245,7 @@ export function OffersTable() {
                 <PaginationLink
                   onClick={() => table.setPageIndex(pageNumber)}
                   isActive={pageNumber === pageIndex}
+                  className="select-none"
                 >
                   {pageNumber + 1}
                 </PaginationLink>
@@ -164,6 +254,7 @@ export function OffersTable() {
           })}
           <PaginationItem>
             <PaginationNext
+              className="select-none"
               onClick={() => table.nextPage()}
               isActive={table.getCanNextPage()}
               style={{
@@ -174,6 +265,16 @@ export function OffersTable() {
           </PaginationItem>
         </PaginationContent>
       </Pagination>
+      <OfferDetailsDialog
+        offer={selectedOffer}
+        isOpen={showDetailsModal}
+        onClose={() => setShowDetailsModal(false)}
+      />
+      <OfferFilterDialog
+        isOpen={showFilterModal}
+        onClose={() => setShowFilterModal(false)}
+        onFilterChange={onFilterChange}
+      />
     </div>
   )
 }

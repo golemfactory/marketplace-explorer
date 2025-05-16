@@ -68,7 +68,7 @@ const paymentPlatformSchema = z.object({
 })
 
 // Payment Platforms Schema
-const paymentPlatformsSchema = z.record(paymentPlatformSchema)
+const paymentPlatformsSchema = z.record(z.string(), paymentPlatformSchema)
 
 // Payment Debit Notes Schema
 const paymentDebitNotesSchema = z.object({
@@ -76,9 +76,21 @@ const paymentDebitNotesSchema = z.object({
 })
 
 // Pricing Model Linear Schema
-const pricingModelLinearSchema = z.object({
-  coeffs: z.tuple([z.number(), z.number(), z.number()]),
-})
+const pricingModelLinearSchema = z
+  .object({
+    coeffs: z.tuple([z.number(), z.number(), z.number()]),
+  })
+  .transform((data) => {
+    const duration = data.coeffs[0]
+    const cpu = data.coeffs[1]
+    const initialPrice = data.coeffs[2]
+    return {
+      coeffs: data.coeffs,
+      cpuPerHour: cpu * 3600,
+      envPerHour: duration * 3600,
+      initialPrice,
+    }
+  })
 
 // Pricing Model Schema
 const pricingSchema = z.object({
@@ -137,15 +149,44 @@ const golemPropertiesSchema = z.object({
 })
 
 // Offer Schema
-export const offerSchema = z.object({
-  constraints: z.string(),
-  offerId: z.string(),
-  properties: z.object({
-    golem: golemPropertiesSchema,
-  }),
-  providerId: z.string(),
-  timestamp: z.string().datetime(),
+export const offerSchema = z
+  .object({
+    constraints: z.string(),
+    offerId: z.string(),
+    properties: z.object({
+      golem: golemPropertiesSchema,
+    }),
+    providerId: z.string(),
+    timestamp: z.string().datetime(),
+  })
+  .transform((data) => {
+    const testNetwork =
+      Object.keys(data.properties.golem.com.payment.platform).findIndex((key) =>
+        key.endsWith('-tglm'),
+      ) > -1
+    const mainNetwork =
+      Object.keys(data.properties.golem.com.payment.platform).findIndex((key) =>
+        key.endsWith('-glm'),
+      ) > -1
+    return {
+      ...data,
+      testNetwork,
+      mainNetwork,
+    }
+  })
+
+// TypeScript Type for Offer
+export type Offer = z.infer<typeof offerSchema>
+
+// Filter Schema
+export const filterSchema = z.object({
+  cpuCores: z.coerce.number().optional(),
+  memoryGiB: z.coerce.number().optional(),
+  storageGiB: z.coerce.number().optional(),
+  pricePerHour: z.coerce.number().optional(),
+  providerName: z.string().optional(),
+  network: z.union([z.literal('mainnet'), z.literal('testnet'), z.literal('')]).optional(),
 })
 
-// TypeScript Type
-export type Offer = z.infer<typeof offerSchema>
+// TypeScript Type for Filter
+export type Filters = z.infer<typeof filterSchema>

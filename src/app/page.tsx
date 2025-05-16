@@ -1,7 +1,7 @@
 import { OffersTable } from '@/components/offers-table'
 import Image from 'next/image'
 
-export default async function Home() {
+export default function Home() {
   return (
     <div className="w-11/12 flex-1 flex-col flex mx-auto font-[family-name:var(--font-geist-sans)] font-bold">
       <main className="flex-1">
@@ -9,7 +9,7 @@ export default async function Home() {
           <OffersTable />
         </div>
       </main>
-      <footer className="flex flex-row items-center justify-center">
+      <footer className="flex flex-row items-center justify-center my-4">
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4 mx-2"
           href="https://golem-base.io"
@@ -30,12 +30,12 @@ export default async function Home() {
         </a>
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4 mx-2"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+          href="https://docs.golem.network"
           target="_blank"
           rel="noopener noreferrer"
         >
           <Image aria-hidden src="/globe.svg" alt="Globe icon" width={16} height={16} />
-          Go to nextjs.org →
+          Golem Docs
         </a>
       </footer>
     </div>
