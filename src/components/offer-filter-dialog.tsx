@@ -1,11 +1,5 @@
 import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import {
   Form,
@@ -55,7 +49,7 @@ export function OfferFilterDialog({ isOpen, onClose, onFilterChange }: OfferFilt
   }
 
   return (
-    <Dialog
+    <Sheet
       onOpenChange={(open) => {
         if (!open) {
           onClose()
@@ -63,10 +57,13 @@ export function OfferFilterDialog({ isOpen, onClose, onFilterChange }: OfferFilt
       }}
       open={isOpen}
     >
-      <DialogContent className="flex flex-col">
-        <DialogHeader>
-          <DialogTitle>Filter Offers</DialogTitle>
-        </DialogHeader>
+      <SheetContent
+        side="right"
+        className="flex flex-col w-[400px] p-4 overflow-y-scroll max-h-screen"
+      >
+        <SheetHeader>
+          <SheetTitle>Filter Offers</SheetTitle>
+        </SheetHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
@@ -79,9 +76,6 @@ export function OfferFilterDialog({ isOpen, onClose, onFilterChange }: OfferFilt
                   <FormControl>
                     <Input type="number" placeholder="Minimum number of CPU cores" {...field} />
                   </FormControl>
-                  <FormDescription>
-                    Filter by minimum number of CPU cores. Leave empty to skip this filter.
-                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -95,9 +89,6 @@ export function OfferFilterDialog({ isOpen, onClose, onFilterChange }: OfferFilt
                   <FormControl>
                     <Input type="number" placeholder="Minimum amount of memory in GiB" {...field} />
                   </FormControl>
-                  <FormDescription>
-                    Filter by minimum amount of memory in GiB. Leave empty to skip this filter.
-                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -115,9 +106,6 @@ export function OfferFilterDialog({ isOpen, onClose, onFilterChange }: OfferFilt
                       {...field}
                     />
                   </FormControl>
-                  <FormDescription>
-                    Filter by minimum amount of storage in GiB. Leave empty to skip this filter.
-                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -131,9 +119,6 @@ export function OfferFilterDialog({ isOpen, onClose, onFilterChange }: OfferFilt
                   <FormControl>
                     <Input type="number" placeholder="Maximum price per hour in GLM" {...field} />
                   </FormControl>
-                  <FormDescription>
-                    Filter by maximum price per hour in GLM. Leave empty to skip this filter.
-                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -154,9 +139,6 @@ export function OfferFilterDialog({ isOpen, onClose, onFilterChange }: OfferFilt
                       <ToggleGroupItem value="testnet">Testnet</ToggleGroupItem>
                     </ToggleGroup>
                   </FormControl>
-                  <FormDescription>
-                    Filter by network. Leave empty to skip this filter.
-                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -170,22 +152,19 @@ export function OfferFilterDialog({ isOpen, onClose, onFilterChange }: OfferFilt
                   <FormControl>
                     <Input placeholder="Optional" {...field} />
                   </FormControl>
-                  <FormDescription>
-                    Filter by provider name. Leave empty to skip this filter.
-                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <DialogFooter className="flex flex-row justify-end">
+            <SheetFooter className="flex flex-row justify-end">
               <Button type="submit" onClick={onClose}>
                 Apply
               </Button>
-            </DialogFooter>
+            </SheetFooter>
           </form>
         </Form>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   )
 }

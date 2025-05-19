@@ -7,8 +7,21 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { copyToClipboard } from '@/lib/utils'
+import { Copy } from 'lucide-react'
 import { Label } from '@/components/ui/label'
 import type { Offer } from '@/lib/schema'
+import { Separator } from '@/components/ui/separator'
+import { toast } from 'sonner'
+import { Badge } from '@/components/ui/badge'
+import {
+  BanknoteIcon,
+  MonitorIcon,
+  Tv2Icon,
+  CpuIcon,
+  MemoryStick,
+  DatabaseIcon,
+} from 'lucide-react'
 
 interface OfferDetailsDialogProps {
   offer?: Offer
@@ -26,39 +39,83 @@ export function OfferDetailsDialog({ offer, isOpen, onClose }: OfferDetailsDialo
       }}
       open={isOpen}
     >
-      <DialogContent className="flex flex-col">
+      <DialogContent className="flex flex-col overflow-y-scroll max-h-screen">
         <DialogHeader>
           <DialogTitle>{offer?.properties.golem.node.id.name}</DialogTitle>
-          <DialogDescription>
-            Node ID: {offer?.offerId} <Button variant="link">Copy</Button>
+          <DialogDescription className="flex flex-row justify-between items-center">
+            <span className="mr-2">Node ID:</span>
+            <span className="flex-1 truncate truncate-ellipsis">{offer?.offerId}</span>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => {
+                copyToClipboard(offer?.offerId || '')
+                toast('Node ID copied to clipboard')
+              }}
+            >
+              <Copy className="h-4 w-4" />
+            </Button>
           </DialogDescription>
-          <Label>Available on: {getNetworks(offer)}</Label>
+          <div className="flex flex-row items-center gap-2">
+            <Label>Available on: </Label>
+            {offer?.testNetwork && <Badge>testnet</Badge>}
+            {offer?.mainNetwork && <Badge>mainnet</Badge>}
+          </div>
         </DialogHeader>
 
+        <Separator />
         <section>
-          <h3>Hardware</h3>
-          <p>
-            CPU: {offer?.properties.golem.inf.cpu.cores} cores /{' '}
-            {offer?.properties.golem.inf.cpu.threads} threads
-          </p>
-          <p>Memory: {offer?.properties.golem.inf.mem.gib} GiB</p>
-          <p>Storage: {offer?.properties.golem.inf.storage.gib} GiB</p>
+          <h3 className="font-bold border border-primary rounded-xl p-2">Hardware</h3>
+          <div className="p-2 flex flex-col gap-2">
+            <div className="flex flex-row items-center gap-2">
+              <CpuIcon className="basis-none" />
+              <Label className="basis-1/6">CPU cores:</Label>
+              <p className="flex-1">{offer?.properties.golem.inf.cpu.threads}</p>
+            </div>
+            <div className="flex flex-row items-center gap-2">
+              <MemoryStick className="basis-none" />
+              <Label className="basis-1/6">Memory:</Label>
+              <p className="flex-1">{offer?.properties.golem.inf.mem.gib.toFixed(2)} GiB</p>
+            </div>
+            <div className="flex flex-row items-center gap-2">
+              <DatabaseIcon className="basis-none" />
+              <Label className="basis-1/6">Storage:</Label>
+              <p className="flex-1">{offer?.properties.golem.inf.storage.gib.toFixed(2)} GiB</p>
+            </div>
+            <div className="flex flex-row items-center gap-2">
+              <Tv2Icon className="basis-none" />
+              <Label className="basis-1/6">Runtime:</Label>
+              <Badge>{offer?.properties.golem.runtime.name}</Badge>
+            </div>
+          </div>
         </section>
 
+        <Separator />
         <section>
-          <h3>Pricing</h3>
-          <p>CPU/hour: {offer?.properties.golem.com.pricing.model.linear.cpuPerHour} GLM</p>
-          <p>Env/hour: {offer?.properties.golem.com.pricing.model.linear.envPerHour} GLM</p>
-          <p>Start price: {offer?.properties.golem.com.pricing.model.linear.initialPrice} GLM</p>
-        </section>
-
-        <section>
-          <h3>Payment</h3>
-          <p>Accepted Networks: {getAcceptedNetworks(offer)}</p>
-          {/* <p>
-            Wallet Address: {offer?.properties.golem.com.payment.platform['mainnet'].address}{' '}
-            <Button variant="link">Copy</Button>
-          </p> */}
+          <h3 className="font-bold border border-primary rounded-xl p-2">Pricing</h3>
+          <div className="p-2 flex flex-col gap-2">
+            <div className="flex flex-row items-center gap-2">
+              <CpuIcon className="basis-none" />
+              <Label className="basis-1/6">CPU/hour:</Label>
+              <p className="flex-1">
+                {offer?.properties.golem.com.pricing.model.linear.cpuPerHour.toFixed(2)} GLM
+              </p>
+            </div>
+            <div className="flex flex-row items-center gap-2">
+              <MonitorIcon className="basis-none" />
+              <Label className="basis-1/6">Env/hour:</Label>
+              <p className="flex-1">
+                {offer?.properties.golem.com.pricing.model.linear.envPerHour.toFixed(2)} GLM
+              </p>
+            </div>
+            <div className="flex flex-row items-center gap-2">
+              <BanknoteIcon className="basis-none" />
+              <Label className="basis-1/6">Start price:</Label>
+              <p className="flex-1">
+                {offer?.properties.golem.com.pricing.model.linear.initialPrice.toFixed(2)} GLM
+              </p>
+            </div>
+          </div>
         </section>
 
         <DialogFooter className="flex flex-row justify-end">
@@ -69,20 +126,4 @@ export function OfferDetailsDialog({ offer, isOpen, onClose }: OfferDetailsDialo
       </DialogContent>
     </Dialog>
   )
-}
-
-function getNetworks(offer?: Offer): string {
-  if (!offer) {
-    return ''
-  }
-  // Logic to determine which networks the offer is available on
-  return 'mainnet, testnet' // Example placeholder
-}
-
-function getAcceptedNetworks(offer?: Offer): string {
-  if (!offer) {
-    return ''
-  }
-  // Logic to determine which networks are accepted for payment
-  return 'mainnet, testnet' // Example placeholder
 }

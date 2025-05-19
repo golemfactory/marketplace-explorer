@@ -2,6 +2,7 @@
 
 import {
   type ColumnDef,
+  type Header,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -13,6 +14,7 @@ import {
 import {
   Pagination,
   PaginationContent,
+  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
@@ -31,9 +33,19 @@ import {
 import type { Filters, Offer } from '@/lib/schema'
 import { useOffersQuery } from '@/lib/query'
 import { Button } from '@/components/ui/button'
-import { FilterIcon, CpuIcon, MemoryStick, DatabaseIcon, Banknote, NetworkIcon } from 'lucide-react'
-import { OfferDetailsDialog } from './offer-details-dialog'
+import {
+  FilterIcon,
+  CpuIcon,
+  MemoryStick,
+  DatabaseIcon,
+  Banknote,
+  NetworkIcon,
+  ArrowUpIcon,
+  ArrowDownIcon,
+  ArrowUpDownIcon,
+} from 'lucide-react'
 import { useState } from 'react'
+import { OfferDetailsDialog } from './offer-details-dialog'
 import { OfferFilterDialog } from './offer-filter-dialog'
 
 const cellContent = (value: string, icon: React.ReactNode) => {
@@ -45,10 +57,39 @@ const cellContent = (value: string, icon: React.ReactNode) => {
   )
 }
 
+const columnCellContent = (header: Header<Offer, unknown>) => {
+  return (
+    <div className="flex items-center gap-2">
+      {flexRender(header.column.columnDef.header, header.getContext())}
+      {header.column.getCanSort() ? (
+        <Button
+          variant="default"
+          size="icon"
+          onClick={() => header.column.toggleSorting(header.column.getIsSorted() === 'asc')}
+        >
+          {header.column.getIsSorted() === 'asc' ? (
+            <ArrowUpIcon />
+          ) : header.column.getIsSorted() === 'desc' ? (
+            <ArrowDownIcon />
+          ) : (
+            <ArrowUpDownIcon />
+          )}
+        </Button>
+      ) : null}
+    </div>
+  )
+}
+
 const columns: ColumnDef<Offer>[] = [
   {
+    id: 'providerName',
     accessorFn: (offer) => offer.properties.golem.node.id.name,
     header: 'Provider',
+    enableColumnFilter: true,
+    enableSorting: false,
+    filterFn: (row, _id, value) => {
+      return row.original.properties.golem.node.id.name.includes(value)
+    },
   },
   {
     id: 'cpuCores',
@@ -90,6 +131,7 @@ const columns: ColumnDef<Offer>[] = [
     cell: (info) => cellContent(info.getValue() as string, <NetworkIcon />),
     header: 'Network',
     enableColumnFilter: true,
+    enableSorting: false,
     filterFn: (row, _id, value) => {
       return (
         (value === 'mainnet' && row.original.mainNetwork) ||
@@ -107,6 +149,14 @@ const columns: ColumnDef<Offer>[] = [
     },
     cell: (info) => cellContent(info.getValue() as string, <Banknote />),
     header: 'Price',
+    enableColumnFilter: true,
+    filterFn: (row, _id, value) => {
+      return (
+        row.original.properties.golem.com.pricing.model.linear.cpuPerHour +
+          row.original.properties.golem.com.pricing.model.linear.envPerHour <=
+        value
+      )
+    },
     enableSorting: true,
   },
 ]
@@ -160,6 +210,14 @@ export function OffersTable() {
         id: 'network',
         value: filters.network,
       },
+      {
+        id: 'pricePerHour',
+        value: filters.pricePerHour,
+      },
+      {
+        id: 'providerName',
+        value: filters.providerName,
+      },
     ])
   }
 
@@ -187,9 +245,7 @@ export function OffersTable() {
               {headerGroup.headers.map((header) => {
                 return (
                   <TableHead key={header.id} className="text-primary-foreground px-4">
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
+                    {header.isPlaceholder ? null : columnCellContent(header)}
                   </TableHead>
                 )
               })}
@@ -252,6 +308,10 @@ export function OffersTable() {
               </PaginationItem>
             )
           })}
+          {table.getPageCount() > 5 &&
+            table.getPageCount() > table.getState().pagination.pageIndex + 2 && (
+              <PaginationEllipsis />
+            )}
           <PaginationItem>
             <PaginationNext
               className="select-none"

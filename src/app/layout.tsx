@@ -1,16 +1,18 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Inter, Roboto_Mono } from 'next/font/google'
 import Image from 'next/image'
 import { QueryClientProvider } from '@/providers/QueryClientProvider'
 import './globals.css'
+import { Toaster } from '@/components/ui/sonner'
+import { Label } from '@/components/ui/label'
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+const inter = Inter({
+  variable: '--font-inter',
   subsets: ['latin'],
 })
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+const robotoMono = Roboto_Mono({
+  variable: '--font-roboto-mono',
   subsets: ['latin'],
 })
 
@@ -27,13 +29,25 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
+        className={`${inter.variable} ${robotoMono.variable} antialiased flex flex-col min-h-screen overflow-auto`}
       >
         <QueryClientProvider>
           <div className="flex-none w-full h-16 flex  bg-primary">
-            <Image src="/golem_logo.png" alt="Golem logo" width={180} height={38} priority />
+            <Label className="ml-2 text-primary-foreground">Powered by</Label>
+            <Image
+              className="m-1"
+              src="/golem_symbol_white.png"
+              alt="Golem logo"
+              width={64}
+              height={64}
+              priority
+            />
+            <Label className="text-3xl font-bold text-primary-foreground ml-auto mr-8">
+              Golem Network Marketplace
+            </Label>
           </div>
           <div className="flex flex-col flex-1">{children}</div>
+          <Toaster />
         </QueryClientProvider>
       </body>
     </html>
