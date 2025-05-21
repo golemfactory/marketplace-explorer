@@ -43,10 +43,12 @@ import {
   ArrowUpIcon,
   ArrowDownIcon,
   ArrowUpDownIcon,
+  Loader2,
 } from 'lucide-react'
 import { useState } from 'react'
 import { OfferDetailsDialog } from './offer-details-dialog'
 import { OfferFilterDialog } from './offer-filter-dialog'
+import { RefreshBtn } from './refresh-btn'
 
 const cellContent = (value: string, icon: React.ReactNode) => {
   return (
@@ -164,10 +166,11 @@ const columns: ColumnDef<Offer>[] = [
 const pageSize = 10
 
 export function OffersTable() {
-  const { data: offers } = useOffersQuery()
   const [showDetailsModal, setShowDetailsModal] = useState(false)
   const [showFilterModal, setShowFilterModal] = useState(false)
+  const [refetchInterval, setRefetchInterval] = useState<number | undefined>(5000)
   const [selectedOffer, setSelectedOffer] = useState<Offer | undefined>(undefined)
+  const { data: offers, isRefetching, refetch } = useOffersQuery(refetchInterval)
 
   const table = useReactTable({
     data: offers ?? [],
@@ -223,11 +226,21 @@ export function OffersTable() {
 
   return (
     <div>
-      <div className="flex flex-1 justify-between">
+      {isRefetching && (
+        <div className="flex flex-row items-center justify-center">
+          <Loader2 className="h-4 w-4 animate-spin" />
+        </div>
+      )}
+      <div className="flex flex-row flex-1 justify-between">
         <div className="text-2xl font-bold flex-1">
           {table.getFilteredRowModel().rows.length} active offers
         </div>
-        <div>
+        <div className="flex flex-row-reverse flex-1 gap-2">
+          <RefreshBtn
+            isRefetching={isRefetching}
+            refetchData={refetch}
+            onIntervalChange={setRefetchInterval}
+          />
           <Button
             variant="outline"
             className="rounded-md bg-primary text-primary-foreground"

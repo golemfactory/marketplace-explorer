@@ -18,7 +18,7 @@ export const queryClient = new QueryClient({
   },
 })
 
-export const useOffersQuery = () => {
+export const useOffersQuery = (refetchInterval?: number) => {
   return useQuery({
     queryKey: ['offers'],
     queryFn: async () => {
@@ -45,5 +45,6 @@ export const useOffersQuery = () => {
       console.info(`Found ${offers?.length} offers`, offers)
       return offers
     },
+    refetchInterval: refetchInterval,
   })
 }
