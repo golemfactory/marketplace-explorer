@@ -168,7 +168,7 @@ const pageSize = 10
 export function OffersTable() {
   const [showDetailsModal, setShowDetailsModal] = useState(false)
   const [showFilterModal, setShowFilterModal] = useState(false)
-  const [refetchInterval, setRefetchInterval] = useState<number | undefined>(5000)
+  const [refetchInterval, setRefetchInterval] = useState<number | undefined>(undefined)
   const [selectedOffer, setSelectedOffer] = useState<Offer | undefined>(undefined)
   const { data: offers, isRefetching, refetch } = useOffersQuery(refetchInterval)
 
