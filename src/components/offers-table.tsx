@@ -226,11 +226,6 @@ export function OffersTable() {
 
   return (
     <div>
-      {isRefetching && (
-        <div className="flex flex-row items-center justify-center">
-          <Loader2 className="h-4 w-4 animate-spin" />
-        </div>
-      )}
       <div className="flex flex-row flex-1 justify-between">
         <div className="text-2xl font-bold flex-1">
           {table.getFilteredRowModel().rows.length} active offers

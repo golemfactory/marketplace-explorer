@@ -1,12 +1,13 @@
 'use client'
 
-import { ChevronDown, Loader2, RefreshCcw } from 'lucide-react'
+import { ChevronDown, ChevronUp, Loader2, RefreshCcw } from 'lucide-react'
 import { Button } from './ui/button'
 import { useState } from 'react'
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
 import { Command, CommandItem } from './ui/command'
 
 enum RefetchIntervalEnum {
+  INTERVAL_OFF = 0,
   INTERVAL_5S = 5000,
   INTERVAL_15S = 15000,
   INTERVAL_30S = 30000,
@@ -17,6 +18,7 @@ enum RefetchIntervalEnum {
 }
 
 const REFRESH_INTERVAL_DISPLAY_MAP = {
+  [RefetchIntervalEnum.INTERVAL_OFF]: 'off',
   [RefetchIntervalEnum.INTERVAL_5S]: '5s',
   [RefetchIntervalEnum.INTERVAL_15S]: '15s',
   [RefetchIntervalEnum.INTERVAL_30S]: '30s',
@@ -39,8 +41,8 @@ export function RefreshBtn({
   refetchData,
   className,
 }: RefreshBtnProps) {
-  const [refetchInterval, setRefetchInterval] = useState<RefetchIntervalEnum | undefined>(
-    RefetchIntervalEnum.INTERVAL_5S,
+  const [refetchInterval, setRefetchInterval] = useState<RefetchIntervalEnum>(
+    RefetchIntervalEnum.INTERVAL_OFF,
   )
   const [isPopoverOpen, setIsPopoverOpen] = useState(false)
 
@@ -64,8 +66,15 @@ export function RefreshBtn({
         <PopoverTrigger asChild>
           <Button variant="outline" className="rounded-l-none p-2">
             <span className="flex items-center gap-1">
-              <ChevronDown className="w-4 h-4" />
-              <span>{refetchInterval && REFRESH_INTERVAL_DISPLAY_MAP[refetchInterval]}</span>
+              {isPopoverOpen ? (
+                <ChevronUp className="w-4 h-4" />
+              ) : (
+                <ChevronDown className="w-4 h-4" />
+              )}
+              <span>
+                {refetchInterval !== RefetchIntervalEnum.INTERVAL_OFF &&
+                  REFRESH_INTERVAL_DISPLAY_MAP[refetchInterval]}
+              </span>
             </span>
           </Button>
         </PopoverTrigger>
