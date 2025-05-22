@@ -41,25 +41,45 @@ export function OfferDetailsDialog({ offer, isOpen, onClose }: OfferDetailsDialo
     >
       <DialogContent className="flex flex-col overflow-y-scroll max-h-screen">
         <DialogHeader>
-          <DialogTitle>{offer?.properties.golem.node.id.name}</DialogTitle>
-          <DialogDescription className="flex flex-row justify-between items-center">
-            <span className="mr-2">Node ID:</span>
-            <span className="flex-1 truncate truncate-ellipsis">{offer?.offerId}</span>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => {
-                copyToClipboard(offer?.offerId || '')
-                toast('Node ID copied to clipboard')
-              }}
-            >
-              <Copy className="h-4 w-4" />
-            </Button>
+          <DialogTitle className="text-2xl font-bold">
+            {offer?.properties.golem.node.id.name}
+          </DialogTitle>
+          <DialogDescription className="flex flex-col gap-1">
+            <section className="flex flex-row items-center gap-2">
+              <Label>Available on: </Label>
+              {offer?.testNetwork && <Badge>testnet</Badge>}
+              {offer?.mainNetwork && <Badge>mainnet</Badge>}
+            </section>
           </DialogDescription>
-          <div className="flex flex-row items-center gap-2">
-            <Label>Available on: </Label>
-            {offer?.testNetwork && <Badge>testnet</Badge>}
-            {offer?.mainNetwork && <Badge>mainnet</Badge>}
+          <div className="flex flex-col">
+            <div className="flex flex-row justify-between items-center">
+              <span className="mr-2">Node ID:</span>
+              <span className="flex-1 truncate truncate-ellipsis">{offer?.providerId}</span>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  copyToClipboard(offer?.providerId || '')
+                  toast('Node ID copied to clipboard')
+                }}
+              >
+                <Copy className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="flex flex-row justify-between items-center">
+              <span className="mr-2">Offer ID:</span>
+              <span className="flex-1 truncate truncate-ellipsis">{offer?.offerId}</span>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  copyToClipboard(offer?.offerId || '')
+                  toast('Offer ID copied to clipboard')
+                }}
+              >
+                <Copy className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </DialogHeader>
 
