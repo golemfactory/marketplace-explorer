@@ -45,11 +45,11 @@ export function OfferDetailsDialog({ offer, isOpen, onClose }: OfferDetailsDialo
             {offer?.properties.golem.node.id.name}
           </DialogTitle>
           <DialogDescription className="flex flex-col gap-1">
-            <section className="flex flex-row items-center gap-2">
+            <span className="flex flex-row items-center gap-2">
               <Label>Available on: </Label>
               {offer?.testNetwork && <Badge>testnet</Badge>}
               {offer?.mainNetwork && <Badge>mainnet</Badge>}
-            </section>
+            </span>
           </DialogDescription>
           <div className="flex flex-col">
             <div className="flex flex-row justify-between items-center">
