@@ -32,17 +32,8 @@ export default function RootLayout({
         className={`${inter.variable} ${robotoMono.variable} antialiased flex flex-col min-h-screen overflow-auto`}
       >
         <QueryClientProvider>
-          <div className="flex-none w-full h-16 flex  bg-primary">
-            <Label className="ml-2 text-primary-foreground">Powered by</Label>
-            <Image
-              className="m-1"
-              src="/golem_symbol_white.png"
-              alt="Golem logo"
-              width={64}
-              height={64}
-              priority
-            />
-            <Label className="text-3xl font-bold text-primary-foreground ml-auto mr-8">
+          <div className="flex-none w-full h-16 flex bg-primary items-center">
+            <Label className="w-11/12 text-3xl font-bold text-primary-foreground mx-auto">
               Golem Network Marketplace
             </Label>
           </div>

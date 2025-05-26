@@ -43,7 +43,6 @@ import {
   ArrowUpIcon,
   ArrowDownIcon,
   ArrowUpDownIcon,
-  Loader2,
 } from 'lucide-react'
 import { useState } from 'react'
 import { OfferDetailsDialog } from './offer-details-dialog'
@@ -236,11 +235,7 @@ export function OffersTable() {
             refetchData={refetch}
             onIntervalChange={setRefetchInterval}
           />
-          <Button
-            variant="outline"
-            className="rounded-md bg-primary text-primary-foreground"
-            onClick={() => setShowFilterModal(true)}
-          >
+          <Button variant="default" className="rounded-md" onClick={() => setShowFilterModal(true)}>
             <FilterIcon className="mr-2 h-4 w-4" />
             Filter
           </Button>
@@ -285,54 +280,56 @@ export function OffersTable() {
           )}
         </TableBody>
       </Table>
-      <Pagination>
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious
-              className="select-none"
-              onClick={() => table.previousPage()}
-              isActive={table.getCanPreviousPage()}
-              style={{
-                pointerEvents: table.getCanPreviousPage() ? 'auto' : 'none',
-                opacity: table.getCanPreviousPage() ? 1 : 0.5,
-              }}
-            />
-          </PaginationItem>
-          {Array.from({ length: Math.min(5, table.getPageCount()) }, (_, index) => {
-            const pageIndex = table.getState().pagination.pageIndex
-            const pageCount = table.getPageCount()
-            const start = Math.max(0, Math.min(pageIndex - 2, pageCount - 5))
-            const pageNumber = start + index
+      {table.getPageCount() > 1 && (
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                className="select-none text-md"
+                onClick={() => table.previousPage()}
+                isActive={table.getCanPreviousPage()}
+                style={{
+                  pointerEvents: table.getCanPreviousPage() ? 'auto' : 'none',
+                  opacity: table.getCanPreviousPage() ? 1 : 0.5,
+                }}
+              />
+            </PaginationItem>
+            {Array.from({ length: Math.min(5, table.getPageCount()) }, (_, index) => {
+              const pageIndex = table.getState().pagination.pageIndex
+              const pageCount = table.getPageCount()
+              const start = Math.max(0, Math.min(pageIndex - 2, pageCount - 5))
+              const pageNumber = start + index
 
-            return (
-              <PaginationItem key={pageNumber}>
-                <PaginationLink
-                  onClick={() => table.setPageIndex(pageNumber)}
-                  isActive={pageNumber === pageIndex}
-                  className="select-none"
-                >
-                  {pageNumber + 1}
-                </PaginationLink>
-              </PaginationItem>
-            )
-          })}
-          {table.getPageCount() > 5 &&
-            table.getPageCount() > table.getState().pagination.pageIndex + 2 && (
-              <PaginationEllipsis />
-            )}
-          <PaginationItem>
-            <PaginationNext
-              className="select-none"
-              onClick={() => table.nextPage()}
-              isActive={table.getCanNextPage()}
-              style={{
-                pointerEvents: table.getCanNextPage() ? 'auto' : 'none',
-                opacity: table.getCanNextPage() ? 1 : 0.5,
-              }}
-            />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
+              return (
+                <PaginationItem key={pageNumber}>
+                  <PaginationLink
+                    onClick={() => table.setPageIndex(pageNumber)}
+                    isActive={pageNumber === pageIndex}
+                    className="select-none"
+                  >
+                    {pageNumber + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              )
+            })}
+            {table.getPageCount() > 5 &&
+              table.getPageCount() > table.getState().pagination.pageIndex + 2 && (
+                <PaginationEllipsis />
+              )}
+            <PaginationItem>
+              <PaginationNext
+                className="select-none text-md"
+                onClick={() => table.nextPage()}
+                isActive={table.getCanNextPage()}
+                style={{
+                  pointerEvents: table.getCanNextPage() ? 'auto' : 'none',
+                  opacity: table.getCanNextPage() ? 1 : 0.5,
+                }}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      )}
       <OfferDetailsDialog
         offer={selectedOffer}
         isOpen={showDetailsModal}

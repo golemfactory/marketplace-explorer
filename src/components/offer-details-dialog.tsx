@@ -85,7 +85,7 @@ export function OfferDetailsDialog({ offer, isOpen, onClose }: OfferDetailsDialo
 
         <Separator />
         <section>
-          <h3 className="font-bold border border-primary rounded-xl p-2">Hardware</h3>
+          <h3 className="font-bold  p-2">Hardware</h3>
           <div className="p-2 flex flex-col gap-2">
             <div className="flex flex-row items-center gap-2">
               <CpuIcon className="basis-none" />
@@ -112,7 +112,7 @@ export function OfferDetailsDialog({ offer, isOpen, onClose }: OfferDetailsDialo
 
         <Separator />
         <section>
-          <h3 className="font-bold border border-primary rounded-xl p-2">Pricing</h3>
+          <h3 className="font-bold p-2">Pricing</h3>
           <div className="p-2 flex flex-col gap-2">
             <div className="flex flex-row items-center gap-2">
               <CpuIcon className="basis-none" />

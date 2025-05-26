@@ -82,6 +82,7 @@ export function RefreshBtn({
           <Command>
             {Object.entries(REFRESH_INTERVAL_DISPLAY_MAP).map(([key, value]) => (
               <CommandItem
+                className="cursor-pointer text-primary text-md"
                 key={key}
                 onSelect={() => {
                   onIntervalChange(Number(key))
