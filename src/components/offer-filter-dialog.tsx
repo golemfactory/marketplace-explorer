@@ -152,6 +152,7 @@ export function OfferFilterDialog({ isOpen, onClose, onFilterChange }: OfferFilt
                       type="single"
                       value={field.value || undefined}
                       onValueChange={field.onChange}
+                      variant="outline"
                     >
                       <ToggleGroupItem value="mainnet">Mainnet</ToggleGroupItem>
                       <ToggleGroupItem value="testnet">Testnet</ToggleGroupItem>

@@ -1,6 +1,6 @@
 import { OffersTable } from '@/components/offers-table'
 import { Separator } from '@/components/ui/separator'
-import { DatabaseIcon, GlobeIcon, FileIcon } from 'lucide-react'
+import { GlobeIcon, FileIcon } from 'lucide-react'
 import { DiscordOutlined, XOutlined } from '@ant-design/icons'
 
 export default function Home() {
