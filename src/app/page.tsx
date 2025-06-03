@@ -2,12 +2,14 @@ import { OffersTable } from '@/components/offers-table'
 import { Separator } from '@/components/ui/separator'
 import { GlobeIcon, FileIcon } from 'lucide-react'
 import { DiscordOutlined, XOutlined } from '@ant-design/icons'
+import MarketplaceInfo from '@/components/marketplace-info'
 
 export default function Home() {
   return (
     <div className="w-11/12 flex-1 flex-col flex mx-auto font-[family-name:var(--font-geist-sans)] font-bold">
-      <main className="flex-1">
-        <div className="mt-16">
+      <main className="flex-1 mb-2">
+        <MarketplaceInfo />
+        <div className="mt-8">
           <OffersTable />
         </div>
       </main>
