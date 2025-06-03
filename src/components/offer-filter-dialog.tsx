@@ -74,7 +74,12 @@ export function OfferFilterDialog({ isOpen, onClose, onFilterChange }: OfferFilt
                 <FormItem>
                   <FormLabel>CPU Cores</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="Minimum number of CPU cores" {...field} />
+                    <Input
+                      type="number"
+                      min={0}
+                      placeholder="Minimum number of CPU cores"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -87,7 +92,13 @@ export function OfferFilterDialog({ isOpen, onClose, onFilterChange }: OfferFilt
                 <FormItem>
                   <FormLabel>Memory (GiB)</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="Minimum amount of memory in GiB" {...field} />
+                    <Input
+                      type="number"
+                      min={0}
+                      step={0.5}
+                      placeholder="Minimum amount of memory in GiB"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -102,6 +113,8 @@ export function OfferFilterDialog({ isOpen, onClose, onFilterChange }: OfferFilt
                   <FormControl>
                     <Input
                       type="number"
+                      min={0}
+                      step={0.5}
                       placeholder="Minimum amount of storage in GiB"
                       {...field}
                     />
@@ -117,7 +130,12 @@ export function OfferFilterDialog({ isOpen, onClose, onFilterChange }: OfferFilt
                 <FormItem>
                   <FormLabel>Price per hour</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="Maximum price per hour in GLM" {...field} />
+                    <Input
+                      type="number"
+                      min={0}
+                      placeholder="Maximum price per hour in GLM"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -134,6 +152,7 @@ export function OfferFilterDialog({ isOpen, onClose, onFilterChange }: OfferFilt
                       type="single"
                       value={field.value || undefined}
                       onValueChange={field.onChange}
+                      variant="outline"
                     >
                       <ToggleGroupItem value="mainnet">Mainnet</ToggleGroupItem>
                       <ToggleGroupItem value="testnet">Testnet</ToggleGroupItem>

@@ -180,10 +180,10 @@ export type Offer = z.infer<typeof offerSchema>
 
 // Filter Schema
 export const filterSchema = z.object({
-  cpuCores: z.coerce.number().optional(),
-  memoryGiB: z.coerce.number().optional(),
-  storageGiB: z.coerce.number().optional(),
-  pricePerHour: z.coerce.number().optional(),
+  cpuCores: z.coerce.number().min(0).optional(),
+  memoryGiB: z.coerce.number().min(0).optional(),
+  storageGiB: z.coerce.number().min(0).optional(),
+  pricePerHour: z.coerce.number().min(0).optional(),
   providerName: z.string().optional(),
   network: z.union([z.literal('mainnet'), z.literal('testnet'), z.literal('')]).optional(),
 })

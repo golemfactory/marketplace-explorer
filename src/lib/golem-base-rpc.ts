@@ -62,6 +62,6 @@ export const queryEntities = async (query: string) => {
   console.info(`Found ${result.length} entities for query ${query}`)
 
   return result.map((entity) => {
-    return Buffer.from(entity.value, 'base64').toString('utf-8')
+    return [entity.key, Buffer.from(entity.value, 'base64').toString('utf-8')]
   })
 }

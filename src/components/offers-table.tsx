@@ -47,6 +47,7 @@ import {
 import { useState } from 'react'
 import { OfferDetailsDialog } from './offer-details-dialog'
 import { OfferFilterDialog } from './offer-filter-dialog'
+import { RefreshBtn } from './refresh-btn'
 
 const cellContent = (value: string, icon: React.ReactNode) => {
   return (
@@ -164,10 +165,11 @@ const columns: ColumnDef<Offer>[] = [
 const pageSize = 10
 
 export function OffersTable() {
-  const { data: offers } = useOffersQuery()
   const [showDetailsModal, setShowDetailsModal] = useState(false)
   const [showFilterModal, setShowFilterModal] = useState(false)
+  const [refetchInterval, setRefetchInterval] = useState<number | undefined>(undefined)
   const [selectedOffer, setSelectedOffer] = useState<Offer | undefined>(undefined)
+  const { data: offers, isRefetching, refetch } = useOffersQuery(refetchInterval)
 
   const table = useReactTable({
     data: offers ?? [],
@@ -223,16 +225,17 @@ export function OffersTable() {
 
   return (
     <div>
-      <div className="flex flex-1 justify-between">
+      <div className="flex flex-row flex-1 justify-between">
         <div className="text-2xl font-bold flex-1">
           {table.getFilteredRowModel().rows.length} active offers
         </div>
-        <div>
-          <Button
-            variant="outline"
-            className="rounded-md bg-primary text-primary-foreground"
-            onClick={() => setShowFilterModal(true)}
-          >
+        <div className="flex flex-row-reverse flex-1 gap-2">
+          <RefreshBtn
+            isRefetching={isRefetching}
+            refetchData={refetch}
+            onIntervalChange={setRefetchInterval}
+          />
+          <Button variant="default" className="rounded-md" onClick={() => setShowFilterModal(true)}>
             <FilterIcon className="mr-2 h-4 w-4" />
             Filter
           </Button>
@@ -277,54 +280,56 @@ export function OffersTable() {
           )}
         </TableBody>
       </Table>
-      <Pagination>
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious
-              className="select-none"
-              onClick={() => table.previousPage()}
-              isActive={table.getCanPreviousPage()}
-              style={{
-                pointerEvents: table.getCanPreviousPage() ? 'auto' : 'none',
-                opacity: table.getCanPreviousPage() ? 1 : 0.5,
-              }}
-            />
-          </PaginationItem>
-          {Array.from({ length: Math.min(5, table.getPageCount()) }, (_, index) => {
-            const pageIndex = table.getState().pagination.pageIndex
-            const pageCount = table.getPageCount()
-            const start = Math.max(0, Math.min(pageIndex - 2, pageCount - 5))
-            const pageNumber = start + index
+      {table.getPageCount() > 1 && (
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                className="select-none text-md"
+                onClick={() => table.previousPage()}
+                isActive={table.getCanPreviousPage()}
+                style={{
+                  pointerEvents: table.getCanPreviousPage() ? 'auto' : 'none',
+                  opacity: table.getCanPreviousPage() ? 1 : 0.5,
+                }}
+              />
+            </PaginationItem>
+            {Array.from({ length: Math.min(5, table.getPageCount()) }, (_, index) => {
+              const pageIndex = table.getState().pagination.pageIndex
+              const pageCount = table.getPageCount()
+              const start = Math.max(0, Math.min(pageIndex - 2, pageCount - 5))
+              const pageNumber = start + index
 
-            return (
-              <PaginationItem key={pageNumber}>
-                <PaginationLink
-                  onClick={() => table.setPageIndex(pageNumber)}
-                  isActive={pageNumber === pageIndex}
-                  className="select-none"
-                >
-                  {pageNumber + 1}
-                </PaginationLink>
-              </PaginationItem>
-            )
-          })}
-          {table.getPageCount() > 5 &&
-            table.getPageCount() > table.getState().pagination.pageIndex + 2 && (
-              <PaginationEllipsis />
-            )}
-          <PaginationItem>
-            <PaginationNext
-              className="select-none"
-              onClick={() => table.nextPage()}
-              isActive={table.getCanNextPage()}
-              style={{
-                pointerEvents: table.getCanNextPage() ? 'auto' : 'none',
-                opacity: table.getCanNextPage() ? 1 : 0.5,
-              }}
-            />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
+              return (
+                <PaginationItem key={pageNumber}>
+                  <PaginationLink
+                    onClick={() => table.setPageIndex(pageNumber)}
+                    isActive={pageNumber === pageIndex}
+                    className="select-none"
+                  >
+                    {pageNumber + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              )
+            })}
+            {table.getPageCount() > 5 &&
+              table.getPageCount() > table.getState().pagination.pageIndex + 2 && (
+                <PaginationEllipsis />
+              )}
+            <PaginationItem>
+              <PaginationNext
+                className="select-none text-md"
+                onClick={() => table.nextPage()}
+                isActive={table.getCanNextPage()}
+                style={{
+                  pointerEvents: table.getCanNextPage() ? 'auto' : 'none',
+                  opacity: table.getCanNextPage() ? 1 : 0.5,
+                }}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      )}
       <OfferDetailsDialog
         offer={selectedOffer}
         isOpen={showDetailsModal}
