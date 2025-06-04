@@ -43,6 +43,7 @@ import {
   ArrowUpIcon,
   ArrowDownIcon,
   ArrowUpDownIcon,
+  Loader2,
 } from 'lucide-react'
 import { useState } from 'react'
 import { OfferDetailsDialog } from './offer-details-dialog'
@@ -169,7 +170,7 @@ export function OffersTable() {
   const [showFilterModal, setShowFilterModal] = useState(false)
   const [refetchInterval, setRefetchInterval] = useState<number | undefined>(undefined)
   const [selectedOffer, setSelectedOffer] = useState<Offer | undefined>(undefined)
-  const { data: offers, isRefetching, refetch } = useOffersQuery(refetchInterval)
+  const { data: offers, isPending, isRefetching, refetch } = useOffersQuery(refetchInterval)
 
   const table = useReactTable({
     data: offers ?? [],
@@ -241,45 +242,51 @@ export function OffersTable() {
           </Button>
         </div>
       </div>
-      <Table className="border-separate border-spacing-y-4 text-lg font-bold w-full">
-        <TableHeader className="bg-primary h-12">
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id} style={{ backgroundColor: 'var(--primary)' }}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead key={header.id} className="text-primary-foreground px-4">
-                    {header.isPlaceholder ? null : columnCellContent(header)}
-                  </TableHead>
-                )
-              })}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && 'selected'}
-                className="bg-secondary hover:bg-primary/20"
-                onClick={() => onOfferClick(row.original)}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id} className="select-none">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
+      {isPending ? (
+        <div className="flex justify-center items-center h-24">
+          <Loader2 className="animate-spin" />
+        </div>
+      ) : (
+        <Table className="border-separate border-spacing-y-4 text-lg font-bold w-full">
+          <TableHeader className="bg-primary h-12">
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id} style={{ backgroundColor: 'var(--primary)' }}>
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead key={header.id} className="text-primary-foreground px-4">
+                      {header.isPlaceholder ? null : columnCellContent(header)}
+                    </TableHead>
+                  )
+                })}
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && 'selected'}
+                  className="bg-secondary hover:bg-primary/20"
+                  onClick={() => onOfferClick(row.original)}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id} className="select-none">
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="h-24 text-center">
+                  No results.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      )}
       {table.getPageCount() > 1 && (
         <Pagination>
           <PaginationContent>

@@ -19,6 +19,9 @@ const robotoMono = Roboto_Mono({
 export const metadata: Metadata = {
   title: 'Golem Marketplace Explorer',
   description: 'Explore Golem Marketplace',
+  icons: {
+    icon: '/golem_symbol_white.png',
+  },
 }
 
 export default function RootLayout({
