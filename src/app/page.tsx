@@ -1,7 +1,7 @@
 import { OffersTable } from '@/components/offers-table'
 import { Separator } from '@/components/ui/separator'
 import { GlobeIcon, FileIcon } from 'lucide-react'
-import { DiscordOutlined, XOutlined } from '@ant-design/icons'
+import { DiscordOutlined, GithubOutlined, XOutlined } from '@ant-design/icons'
 import MarketplaceInfo from '@/components/marketplace-info'
 
 export default function Home() {
@@ -51,6 +51,15 @@ export default function Home() {
           >
             <FileIcon />
             Golem Docs
+          </a>
+          <a
+            className="flex items-center gap-2 hover:underline hover:underline-offset-4 mx-2"
+            href="https://github.com/golemfactory/marketplace-explorer"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <GithubOutlined />
+            Contribute
           </a>
           <a
             className="flex items-center gap-2 hover:underline hover:underline-offset-4 mx-2"
