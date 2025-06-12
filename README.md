@@ -2,22 +2,10 @@
 
 The Golem Marketplace Explorer is a Next.js-based frontend for browsing real-time offers on the Golem Network. Each offer represents a set of available computing resources, such as CPU time, along with its corresponding price in GLM. This tool provides a live view of active providers on the network and can be especially useful for debugging, testing, or exploring local or custom Golem setups.
 
-## Why Install This
-
-This app is primarily intended for:
-- Developers running a **local Golem testnet**
-- Researchers experimenting with **custom deployments**
-- Operators building or analyzing **private compute networks**
-
-If you're just using the main Golem network to buy or sell compute, this tool might not be necessary.
 
 ## Configuration
 
-To configure the app, open up: `src/env.ts`. Inside that file, set the URL for your target JSON-RPC endpoint. For example:
-
-```ts
-export const RPC_URL = 'http://localhost:8545';
-```
+To configure the app, set the NEXT_PUBLIC_GOLEM_BASE_RPC_URL environment variable to the URL for your target JSON-RPC endpoint. The default is http://localhost:8545/.
 
 ## Running the App
 
@@ -33,18 +21,12 @@ cd marketplace-explorer
 2. Install dependencies:
 
 ```bash
-npm install
+bun install
 ```
 
-3. Start the development server, depending on your package manager:
+3. Start the development server:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
 bun dev
 ```
 
@@ -55,10 +37,6 @@ http://localhost:3000
 ```
 
 Make sure your backend is running and accessible at the configured RPC URL.
-
-## Customizing
-
-You generally don't need to fork or modify the source code to use this tool. Just update the `RPC_URL` in `src/env.ts` to point to your Golem backend, and you're good to go.
 
 ## Learn More
 
