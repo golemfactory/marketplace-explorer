@@ -95,12 +95,12 @@ const columns: ColumnDef<Offer>[] = [
   },
   {
     id: 'cpuCores',
-    accessorFn: (offer) => offer.properties.golem.inf.cpu.cores,
+    accessorFn: (offer) => offer.properties.golem.inf.cpu.threads,
     cell: (info) => cellContent(info.getValue() as string, <CpuIcon />),
     header: 'Cores',
     enableColumnFilter: true,
     filterFn: (row, _id, value) => {
-      return row.original.properties.golem.inf.cpu.cores >= value
+      return row.original.properties.golem.inf.cpu.threads >= value
     },
     enableSorting: true,
   },
